@@ -1,0 +1,5 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>课题资料桥 · 浏览器连接</title><link rel="stylesheet" href="popup.css"><style>body{width:auto;max-width:720px;margin:48px auto}header,main{padding:24px}#log{font-size:13px;max-height:320px;overflow:auto;padding-left:20px}.online{color:#28583d;font-weight:600}</style></head><body>
+<header><span>CLASSROOM × DRIVE</span><h1>课题资料助手 · 浏览器连接</h1><p>此页保持打开或留在后台即可。你选择的课题会由图形助手自动检查、下载和整理。</p></header>
+<main><p id="connection" role="status" aria-live="polite">正在连接本机助手…</p><button id="grant" hidden>首次允许访问课程并连接</button><button id="stop">断开连接</button><button id="retry" hidden>重新连接</button><p id="cloud-status" role="status"></p><button id="grant-cloud" hidden>允许并登录我的聊天连接</button><h2 style="margin-top:24px">后台操作</h2><ol id="log"></ol>
+<p class="note">这里显示的是浏览器与本机服务的连接状态，不代表任何云端聊天已连接。资料默认保存在本机，只有你手动上传或选择自动 AI 分析时才交给对应 AI。关闭此页会停止接收新操作；已开始的下载可能仍在完成。学校限制仍然适用。</p></main>
+<script src="agent.js"></script><script src="connect.js"></script></body></html>

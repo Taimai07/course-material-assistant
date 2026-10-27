@@ -1,0 +1,6 @@
+课题资料助手
+
+Windows 用户运行更新安装器；源码用户安装 server/requirements.txt 后运行 python desktop.py。
+首次打开先选择资料保存位置，再到设置中的“浏览器与聊天”连接 Chrome。
+左侧选课程，右侧进入主题、课题和附件。
+完整使用、源码构建和许可说明见 README.md 与 THIRD_PARTY_NOTICES.md。

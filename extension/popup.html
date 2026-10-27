@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>课题资料桥</title><link rel="stylesheet" href="popup.css"></head>
+<body>
+<header><span>CLASSROOM × DRIVE</span><h1>课题资料助手</h1><p>连接一次。之后交给图形助手在后台自动更新和整理。</p></header>
+<main>
+<button id="connect" class="primary">连接课题资料助手</button>
+<p id="status" role="status" aria-live="polite">先打开图形助手，首次允许课程访问后即可自动连接。</p>
+<p class="note">普通模式不需要 AI。你的专属聊天通道是可选连接。</p>
+<details><summary>旧版配对码（可选）</summary><label>本机配对码<input id="token" type="password" autocomplete="off"></label></details>
+<details id="manual"><summary>手动采集与导出（备用）</summary>
+<label class="check"><input type="checkbox" id="selection">只采集我选中的文字</label>
+<button id="capture">采集当前页面</button>
+<section><div class="section-title"><h2>资料篮</h2><span id="count">0 条</span></div><div id="items"></div>
+<div class="actions"><button id="markdown">导出 Markdown</button><button id="json">导出 JSON</button></div></section>
+<button id="send">发送资料篮到本机</button>
+<p class="note">页面快照不等于完整课程。PDF、画布文档的全文请下载导入，或使用可选 Google 只读授权。</p>
+<button id="clear" class="quiet">清空资料篮</button>
+</details>
+</main><script src="capture.js"></script><script src="popup.js"></script></body></html>

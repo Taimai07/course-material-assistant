@@ -1,0 +1,2 @@
+# Optional: enables text extraction from PDF attachments. All other features use Python's standard library.
+pypdf>=5.0,<7.0

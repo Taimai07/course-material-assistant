@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "课题资料桥 · Classroom & Drive",
+  "version": "0.7.0",
+  "description": "本机脚本批量读取 Classroom 与 Drive，下载资料并打包；不需要 AI，聊天分析与自动化可选。",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "downloads",
+    "alarms"
+  ],
+  "optional_host_permissions": [
+    "http://127.0.0.1/*",
+    "https://classroom.google.com/*",
+    "https://drive.google.com/*",
+    "https://docs.google.com/*",
+    "https://drive.usercontent.google.com/*",
+    "https://*.googleusercontent.com/*",
+    "https://*.chatgpt.site/*",
+    "https://*.chatgpt-team.site/*",
+    "https://*.appgardenapps.dev/*",
+    "https://*.appgardenapps.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "采集课题资料"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApkL6KOuar8i1uFoqKXsr/h0pundMel88Y2pQGaGxmrtaRtbsIf/7m+m9mGveChMiTALUHBme1HcMmRhmBKosdTpuBbyPHK8tu08LFXow4LFYj4f86NbUdmrsjhMGIuNJyqoPLr/FUoKcwGrqP1skRBB+U/SuxfJXdDY8ty72ve2OHzfNEWN2ZwEEVtNmUotiPP7SfV6lpGh/e9HuYk9G07XKCqRyCvoCtg5m1004VNTUumHt5j5Y4L/oGHplT24btZ8nOeeAI2+6tvN5U5MrKmqLzQg+ph+72aSPLSUq0xWom8EV9o0liy6grP/LXOPWacR/9YFIFtRwCJwvTKbU2wIDAQAB",
+  "background": {
+    "service_worker": "background.js"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "course-material-bridge",
+  "version": "0.7.0",
+  "description": "AI-independent local Classroom and Drive collection, portable research bundles, optional local MCP and personal Codex analysis adapter.",
+  "author": {
+    "name": "Course Material Bridge"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "课题资料桥",
+        "shortDescription": "读取 Classroom 与 Drive 课题资料",
+        "longDescription": "本机脚本采集课程与网盘附件，不需要 AI；输出可交给免费 GPT 的文字包与原附件。可选本机 MCP 和个人 Codex 自动分析。学校策略仍然适用。",
+        "developerName": "Course Material Bridge",
+        "capabilities": [],
+        "defaultPrompt": "从我已打开的课程启动脚本批量读取资料、跟随网盘链接并下载附件，再按出处推进课题。"
+      }
+    }
+  }
+}

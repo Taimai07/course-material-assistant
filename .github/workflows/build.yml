@@ -1,0 +1,74 @@
+name: Build and test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: '1'
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: python -m pip install -r server/requirements.txt pyinstaller Pillow
+      - name: Run core tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Check real GUI with synthetic data
+        run: python tests/gui_check.py --screenshot gui-preview.png
+      - name: Collect redistributable license notices
+        run: python packaging/collect_licenses.py
+      - name: Prepare generic public distribution config
+        run: |
+          New-Item -ItemType Directory -Force build/public-config | Out-Null
+          '{"relay_url":""}' | Set-Content -Encoding utf8 build/public-config/personal-connection.json
+      - name: Build standalone GUI
+        run: python -m PyInstaller --noconfirm --clean --onefile --windowed --manifest packaging/windows.manifest --name CourseMaterialAssistant --paths server --add-data "extension;extension" --add-data "build/public-config/personal-connection.json;." desktop.py
+      - name: Check packaged GUI runtime
+        shell: pwsh
+        run: |
+          $checkFile = Join-Path $env:RUNNER_TEMP "course-material-selfcheck.json"
+          $process = Start-Process -FilePath ".\dist\CourseMaterialAssistant.exe" -ArgumentList @("--self-check", $checkFile) -Wait -PassThru
+          if ($process.ExitCode -ne 0 -or -not (Test-Path $checkFile)) { throw "Packaged GUI failed self-check" }
+          $result = Get-Content $checkFile -Raw | ConvertFrom-Json
+          if (-not $result.ok -or -not $result.extension_assets -or $result.dpi.awareness -ne 2) { throw "GUI assets missing" }
+          Get-Content $checkFile
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $compiler)) { choco install innosetup --yes --no-progress }
+          & $compiler packaging/windows.iss
+          if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed" }
+      - name: Verify actual Chinese and Japanese installer windows
+        run: python packaging/check_installer_languages.py
+      - name: Record code-signing status
+        shell: pwsh
+        run: |
+          $files = @('.\dist\CourseMaterialAssistant.exe', '.\installer\CourseMaterialAssistant-Update.exe')
+          $status = foreach ($file in $files) {
+            $signature = Get-AuthenticodeSignature $file
+            [PSCustomObject]@{file=(Split-Path $file -Leaf);status=$signature.Status.ToString();publisher=if ($signature.SignerCertificate) {$signature.SignerCertificate.Subject} else {$null}}
+          }
+          $status | ConvertTo-Json | Set-Content -Encoding utf8 'installer-language-previews/signing-status.json'
+          $status | Format-Table
+      - name: Verify in-place update and data retention
+        shell: pwsh
+        run: ./packaging/check-update.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: course-material-assistant-windows
+          path: |
+            installer/CourseMaterialAssistant-Update.exe
+            packaging/更新说明.txt
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: course-material-installer-language-previews
+          path: installer-language-previews/
+          retention-days: 14
