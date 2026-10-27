@@ -115,7 +115,7 @@ class SettingsWindow(tk.Toplevel):
         ttk.Progressbar(about,variable=app.update_progress,maximum=100).grid(row=3,column=0,columnspan=3,sticky="ew",pady=10)
         ttk.Button(about,text="检查软件更新",command=lambda:app.check_software_update(manual=True)).grid(row=4,column=0,sticky="w",pady=10)
         ttk.Button(about,text="取消下载",command=app.update_cancel.set).grid(row=4,column=1,sticky="w")
-        ttk.Button(about,text="打开安装包下载页",command=lambda:webbrowser.open(ORIGIN)).grid(row=5,column=0,columnspan=3,sticky="w",pady=10)
+        ttk.Button(about,text="打开安装包下载页",command=lambda:webbrowser.open(ORIGIN+"/releases/latest")).grid(row=5,column=0,columnspan=3,sticky="w",pady=10)
         self.note(about,"发现新版本会先询问，确认后下载、校验并打开安装向导，保留课程、资料和设置。检查版本不会上传课程内容。",6)
         footer=ttk.Frame(self,padding=(16,0,16,16));footer.pack(fill="x")
         ttk.Button(footer,text="关闭",command=self.destroy).pack(side="right")

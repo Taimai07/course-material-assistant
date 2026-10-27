@@ -16,7 +16,7 @@ Windows 用户安装发布的更新安装器。首次打开时选择资料保存
 - 可选 Google Drive、OneDrive、Dropbox 本机同步目录，由相应客户端负责上传。
 - 所有偏好集中在设置窗口。课程自动同步和软件版本更新是两个独立选项。
 
-应用下载页： https://course-material-updates-20261028.daringkiwi32.chatgpt.site
+应用下载页： https://github.com/Taimai07/course-material-assistant/releases/latest
 
 ## 从源码运行
 
@@ -45,8 +45,9 @@ tests/agent_check.py 使用合成页面和模拟 Chrome API，需要额外安装
 Windows 构建使用 PyInstaller 和 Inno Setup；.github/workflows/build.yml 提供不含发布凭据的源码构建流程。
 packaging/collect_licenses.py 将实际运行时和依赖许可一起放入安装目录。
 
-官方更新通道通过 HTTPS 固定发布源和 SHA-256 进行来源范围／下载完整性检查；这不等于受信任的 Windows 发布者签名。
-更新服务源码在 packaging/update_service/，只存软件安装包和版本清单。发布接口验证 GitHub Actions OIDC 的签名、仓库、分支、工作流和有效期，不在客户端内嵌发布凭据。
+官方更新通道使用本仓库的 GitHub Releases，版本清单保存在 updates/windows/stable.json。通过 HTTPS 固定仓库和 SHA-256 进行来源范围／下载完整性检查；这不等于受信任的 Windows 发布者签名。
+发布脚本 packaging/publish_update.py 使用 GitHub Actions 的临时仓库令牌，匿名校验安装包后才更新版本清单，不在客户端内嵌发布凭据。
+packaging/update_service/ 保留可选 R2 后端参考实现；当前官方发行不使用它。
 自行分发修改版时应修改更新服务地址和发布身份配置，建立自己的发行通道。
 
 ## 资料与使用权限

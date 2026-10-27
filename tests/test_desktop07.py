@@ -249,7 +249,7 @@ class UpdateTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.payload=b'MZ synthetic installer bytes'
         sha=hashlib.sha256(self.payload).hexdigest()
-        self.manifest={'schema':1,'app_id':'course-material-assistant','platform':'windows','architecture':'x64','version':'0.7.0','sha256':sha,'size':len(self.payload),'url':updates.ORIGIN+'/releases/0.7.0/'+sha+'.exe','notes':'更新说明'}
+        self.manifest={'schema':1,'app_id':'course-material-assistant','platform':'windows','architecture':'x64','version':'0.7.0','sha256':sha,'size':len(self.payload),'url':updates.ORIGIN+'/releases/download/v0.7.0/'+sha+'.exe','notes':'更新说明'}
     def opener(self,body=None):
         manifest=self.manifest;payload=self.payload if body is None else body
         class Opener:
@@ -272,6 +272,18 @@ class UpdateTests(unittest.TestCase):
         for changes in ({'url':'https://evil.example/setup.exe'},{'app_id':'other-app'},{'platform':'macos'},{'size':-1}):
             with self.assertRaises(ValueError):updates.validate_manifest(self.manifest|changes)
         self.assertFalse(updates.trusted_url(updates.ORIGIN+'@evil.example/file.exe'))
+    def test_redirects_allow_only_github_asset_host_and_pin_initial_repository(self):
+        asset='https://release-assets.githubusercontent.com/github-production-release-asset/123/asset?sig=synthetic'
+        self.assertTrue(updates.trusted_url(asset))
+        self.assertFalse(updates.trusted_url('https://release-assets.githubusercontent.com.evil.example/github-production-release-asset/123'))
+        with self.assertRaises(ValueError):updates.validate_manifest(self.manifest|{'url':asset})
+        with self.assertRaises(ValueError):updates.validate_manifest(self.manifest|{'url':self.manifest['url'].replace('Taimai07','SomeoneElse')})
+        class Opener:
+            def open(self,request,timeout):return Response(self_payload,asset,{'Content-Length':str(len(self_payload))})
+        self_payload=self.payload
+        path=updates.download(self.manifest,Path(self.temp.name),opener=Opener())
+        self.assertEqual(path.read_bytes(),self.payload)
+
     def test_version_check_does_not_downgrade_and_stays_noninteractive(self):
         data=json.dumps(self.manifest).encode()
         class Opener:

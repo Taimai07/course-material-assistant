@@ -1,7 +1,10 @@
 name: Build and test
 on: [push, pull_request, workflow_dispatch]
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: course-material-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   windows:
     runs-on: windows-latest
@@ -60,6 +63,11 @@ jobs:
       - name: Verify in-place update and data retention
         shell: pwsh
         run: ./packaging/check-update.ps1
+      - name: Publish verified installer and stable update feed
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]'))
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python packaging/publish_update.py
       - uses: actions/upload-artifact@v4
         with:
           name: course-material-assistant-windows

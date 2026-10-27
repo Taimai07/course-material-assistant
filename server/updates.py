@@ -12,8 +12,8 @@ from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 from file_ops import file_hash, mark_internet_file
 
-ORIGIN = "https://course-material-updates-20261028.daringkiwi32.chatgpt.site"
-FEED_URL = ORIGIN + "/windows/stable.json"
+ORIGIN = "https://github.com/Taimai07/course-material-assistant"
+FEED_URL = "https://raw.githubusercontent.com/Taimai07/course-material-assistant/main/updates/windows/stable.json"
 
 
 def version_tuple(text):
@@ -23,8 +23,16 @@ def version_tuple(text):
 
 
 def trusted_url(url):
-    parsed, origin = urlsplit(url), urlsplit(ORIGIN)
-    return parsed.scheme == "https" and parsed.hostname == origin.hostname and parsed.port in (None, 443) and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment
+    parsed = urlsplit(url)
+    if parsed.scheme != "https" or parsed.port not in (None, 443) or parsed.username or parsed.password or parsed.fragment:
+        return False
+    if url == FEED_URL:
+        return True
+    # GitHub releases redirect bytes to a short-lived signed URL on their asset host.
+    # Manifests themselves must name the exact pinned repository URL, checked separately.
+    if parsed.hostname == "release-assets.githubusercontent.com":
+        return parsed.path.startswith("/github-production-release-asset/")
+    return not parsed.query and bool(re.fullmatch(re.escape(ORIGIN) + r"/releases/download/v\d{1,5}\.\d{1,5}\.\d{1,5}/[a-f0-9]{64}\.exe", url))
 
 
 class UpdateRedirect(HTTPRedirectHandler):
@@ -43,7 +51,7 @@ def validate_manifest(data):
     if not isinstance(sha, str) or not re.fullmatch(r"[a-f0-9]{64}", sha) or type(size) is not int or size <= 0 or size > 1024*1024*1024:
         raise ValueError("更新安装包的大小或校验信息无效")
     url = data.get("url", "")
-    if not isinstance(url, str) or not trusted_url(url) or urlsplit(url).path != f"/releases/{data['version']}/{sha}.exe":
+    if not isinstance(url, str) or not trusted_url(url) or url != ORIGIN + f"/releases/download/v{data['version']}/{sha}.exe":
         raise ValueError("更新安装包地址不属于官方更新服务")
     if not isinstance(data.get("notes", ""), str) or len(data.get("notes", "")) > 8000:
         raise ValueError("更新说明无效")
@@ -55,7 +63,7 @@ def check(current_version, opener=None):
     request = Request(FEED_URL, headers={"Accept": "application/json", "User-Agent": "CourseMaterialAssistant/" + current_version})
     try:
         with opener.open(request, timeout=12) as response:
-            if not trusted_url(response.geturl()):
+            if response.geturl() != FEED_URL:
                 raise ValueError("更新清单地址无效")
             raw = response.read(65537)
             if len(raw) > 65536:
