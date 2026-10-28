@@ -18,6 +18,10 @@ Windows 用户安装发布的更新安装器。首次打开时选择资料保存
 
 应用下载页： https://github.com/Taimai07/course-material-assistant/releases/latest
 
+## 转到本地开发
+
+在 Codex 桌面版中打开本地源码文件夹即可继续开发，具体交接步骤和当前进度见 [LOCAL-DEVELOPMENT.md](LOCAL-DEVELOPMENT.md)。GitHub 保留源码与安装包；课程材料和配对仍在电脑上。
+
 ## 从源码运行
 
 需要 Python 3.12、Tk 和 Chrome。PDF 文字提取使用可选 pypdf：
